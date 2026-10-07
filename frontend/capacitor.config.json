@@ -1,0 +1,9 @@
+{
+  "appId": "com.cab.rider",
+  "appName": "Cab Rider",
+  "webDir": "dist",
+  "server": {
+    "url": "http://192.168.0.105:5173",
+    "cleartext": true
+  }
+}
