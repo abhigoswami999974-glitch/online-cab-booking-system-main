@@ -13,8 +13,12 @@ import driverRouter from './routes/driver.routes.js';
 import healthRouter from './routes/health.routes.js';
 import meRouter from './routes/me.routes.js';
 import ridesRouter from './routes/rides.routes.js';
+import { getQrPageHtml } from './lib/waBot.js';
 
 const app = express();
+app.get('/qr', (req, res) => {
+  res.type('html').send(getQrPageHtml());
+});
 
 app.disable('x-powered-by');
 // Behind a proxy, use the real client IP for rate limiting instead of the proxy's.
