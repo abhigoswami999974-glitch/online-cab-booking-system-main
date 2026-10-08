@@ -35,7 +35,22 @@ export async function sendOtpSms(phone, code) {
         body: '{}',
         signal: AbortSignal.timeout(10_000),
       });
-    }
+    } else if (provider === 'whatsapp') {
+    const { token, phoneNumberId } = env.sms.whatsapp;
+    response = await fetch(`https://graph.facebook.com/v22.0/${phoneNumberId}/messages`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messaging_product: 'whatsapp',
+        to: `91${phone}`,
+        type: 'text',
+        text: { body: text },
+      }),
+      signal: AbortSignal.timeout(10_000),
+    });
 
     if (!response?.ok) {
       // Log status only: provider responses can echo the phone number or account details.

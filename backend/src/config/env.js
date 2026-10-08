@@ -40,10 +40,17 @@ const sms = {
     authKey: process.env.MSG91_AUTH_KEY ?? '',
     templateId: process.env.MSG91_TEMPLATE_ID ?? '',
   },
+  whatsapp: {
+    token: process.env.WHATSAPP_TOKEN ?? '',
+    phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID ?? '',
+  },
 };
 
 const smsProblems = [];
-if (!['console', 'twilio', 'msg91'].includes(smsProvider)) smsProblems.push('SMS_PROVIDER must be console, twilio or msg91.');
+if (!['console', 'twilio', 'msg91', 'whatsapp'].includes(smsProvider)) smsProblems.push('SMS_PROVIDER must be console, twilio, msg91 or whatsapp.');
+if (smsProvider === 'whatsapp' && (!sms.whatsapp.token || !sms.whatsapp.phoneNumberId)) {
+  smsProblems.push('SMS_PROVIDER=whatsapp needs WHATSAPP_TOKEN and WHATSAPP_PHONE_NUMBER_ID.');
+}
 if (smsProvider === 'twilio' && (!sms.twilio.accountSid || !sms.twilio.authToken || !sms.twilio.from)) {
   smsProblems.push('SMS_PROVIDER=twilio needs TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN and TWILIO_FROM.');
 }
