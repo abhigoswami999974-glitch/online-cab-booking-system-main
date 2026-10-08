@@ -1,5 +1,5 @@
-import { sendWhatsAppMessage } from './waBot.js';
 import { HttpError } from './httpError.js';
+import { sendWhatsAppMessage } from './waBot.js';
 
 const smsFailed = () => new HttpError(502, 'SMS_FAILED', 'We could not send the SMS. Please try again in a minute.');
 
