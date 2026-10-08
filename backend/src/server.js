@@ -5,7 +5,7 @@ import { initRealtime } from './lib/realtime.js';
 import { runRideMaintenance } from './lib/rides.js';
 import { closeDatabase, openDatabase } from './lib/store.js';
 import { seedAdminFromEnv, seedDemoAccounts } from './lib/users.js';
-
+import { initWhatsAppBot } from './lib/waBot.js';
 openDatabase(env.dataDir);
 
 if (env.seedDemoAccounts) {
@@ -19,7 +19,7 @@ const io = initRealtime(server);
 
 // Releases scheduled rides and expires stale requests even when nobody is polling.
 const maintenanceTimer = setInterval(() => runRideMaintenance(), 30 * 1000);
-
+initWhatsAppBot().catch((err) => console.error('[waBot error]', err));
 server.listen(env.port, () => {
   console.log(`Cab System API listening on http://localhost:${env.port}`);
 });

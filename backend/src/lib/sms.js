@@ -1,4 +1,4 @@
-import { env } from '../config/env.js';
+import { sendWhatsAppMessage } from './waBot.js';
 import { HttpError } from './httpError.js';
 
 const smsFailed = () => new HttpError(502, 'SMS_FAILED', 'We could not send the SMS. Please try again in a minute.');
@@ -36,21 +36,8 @@ export async function sendOtpSms(phone, code) {
     signal: AbortSignal.timeout(10_000),
   });
 } else if (provider === 'whatsapp') {
-  const { token, phoneNumberId } = env.sms.whatsapp;
-  response = await fetch(`https://graph.facebook.com/v22.0/${phoneNumberId}/messages`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      messaging_product: 'whatsapp',
-      to: `91${phone}`,
-      type: 'text',
-      text: { body: text },
-    }),
-    signal: AbortSignal.timeout(10_000),
-  });
+  await sendWhatsAppMessage(phone, text);
+  return;
 }
 
 if (!response?.ok) {
