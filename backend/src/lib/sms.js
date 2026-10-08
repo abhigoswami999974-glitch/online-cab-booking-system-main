@@ -24,39 +24,40 @@ export async function sendOtpSms(phone, code) {
         headers: { Authorization: `Basic ${Buffer.from(`${accountSid}:${authToken}`).toString('base64')}` },
         body,
         signal: AbortSignal.timeout(10_000),
-      });
-    } else if (provider === 'msg91') {
-      // MSG91 OTP API (v5). The DLT-approved template must contain the ##OTP## variable.
-      const { authKey, templateId } = env.sms.msg91;
-      const params = new URLSearchParams({ template_id: templateId, mobile: `91${phone}`, otp: code, otp_expiry: '10' });
-      response = await fetch(`https://control.msg91.com/api/v5/otp?${params}`, {
-        method: 'POST',
-        headers: { authkey: authKey, 'Content-Type': 'application/json' },
-        body: '{}',
-        signal: AbortSignal.timeout(10_000),
-      });
-    } else if (provider === 'whatsapp') {
-    const { token, phoneNumberId } = env.sms.whatsapp;
-    response = await fetch(`https://graph.facebook.com/v22.0/${phoneNumberId}/messages`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        messaging_product: 'whatsapp',
-        to: `91${phone}`,
-        type: 'text',
-        text: { body: text },
-      }),
-      signal: AbortSignal.timeout(10_000),
-    });
+  });
+} else if (provider === 'msg91') {
+  // MSG91 OTP API (v5). The DLT-approved template must contain the ##OTP## variable.
+  const { authKey, templateId } = env.sms.msg91;
+  const params = new URLSearchParams({ template_id: templateId, mobile: `91${phone}`, otp: code, otp_expiry: '10' });
+  response = await fetch(`https://control.msg91.com/api/v5/otp?${params}`, {
+    method: 'POST',
+    headers: { authkey: authKey, 'Content-Type': 'application/json' },
+    body: '{}',
+    signal: AbortSignal.timeout(10_000),
+  });
+} else if (provider === 'whatsapp') {
+  const { token, phoneNumberId } = env.sms.whatsapp;
+  response = await fetch(`https://graph.facebook.com/v22.0/${phoneNumberId}/messages`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      messaging_product: 'whatsapp',
+      to: `91${phone}`,
+      type: 'text',
+      text: { body: text },
+    }),
+    signal: AbortSignal.timeout(10_000),
+  });
+}
 
-    if (!response?.ok) {
-      // Log status only: provider responses can echo the phone number or account details.
-      console.error(`[sms:${provider}] send failed with HTTP ${response?.status}`);
-      throw smsFailed();
-    }
+if (!response?.ok) {
+  // Log status only: provider responses can echo the phone number or account details.
+  console.error(`[sms:${provider}] send failed with HTTP ${response?.status}`);
+  throw smsFailed();
+}
   } catch (error) {
     if (error instanceof HttpError) throw error;
     console.error(`[sms:${provider}] send failed: ${error.name}`);
